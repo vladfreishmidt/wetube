@@ -3,19 +3,14 @@ import morgan from "morgan"; // Logger
 import helmet from "helmet"; // Secure your Node js App
 import cookieParser from "cookie-parser"; // User sessions
 import bodyParser from "body-parser"; // Recieve data from user eg. contact form
-import { userRouter } from "./router";
-
+import { localsMiddleware } from "./middlewares";
+import routes from "./routes";
+import globalRouter from "./routers/globalRouter";
+import userRouter from "./routers/userRouter";
+import videoRouter from "./routers/videoRouter";
 const app = express();
 
-
-const handleHome = (req, res) => {
-    console.log("Hi from my ass!");
-    res.send('Hi! my ass 2');
-}
-
-const handleProfile = (req, res) => {
-    res.send('Your profile!');
-}
+app.set("view engine", "pug");
 
 // Middlewares
 app.use(helmet());
@@ -24,10 +19,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Routes
-app.get('/', handleHome);
-app.get('/profile', handleProfile);
+app.use(localsMiddleware);
 
-app.use("/user", userRouter);
+// Routers
+app.use(routes.home, globalRouter);
+app.use(routes.users, userRouter);
+app.use(routes.videos, videoRouter);
 
 export default app;
